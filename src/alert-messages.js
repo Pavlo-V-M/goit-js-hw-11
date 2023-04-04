@@ -16,12 +16,12 @@ function showWrong() {
   Notiflix.Notify.failure('Something went wrong. Please try again later.');
 }
 
-// export { showNoResultsMessage };
-// export { showAlert };
-// export { showWrong };
+export { showNoResultsMessage };
+export { showAlert };
+export { showWrong };
 
-export default {
-  showNoResultsMessage,
-  showAlert,
-  showWrong
-};
+// export default {
+//   showNoResultsMessage,
+//   showAlert,
+//   showWrong
+// };
