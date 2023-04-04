@@ -5,10 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page title</title>
     <link rel="stylesheet" href="./sass/index.scss" />
+
+    <!-- Notiflix library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/notiflix/2.7.0/notiflix-2.7.0.min.css"
+      integrity="sha512-kYZ56fYJPRkl9UWOG5l+Z/lpx+tZrNpr8BVboWzDw7J6MK5Y6d7X8pU5/B5PP6cldU1rwbZ41CGWJF2Iw6Jnw=="
+      crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/notiflix/2.7.0/notiflix-2.7.0.min.js"
+      integrity="sha512-1xv/XRSrqomPZTrtH8i0qz3qA77gH2QmVukXbGnQ7xuEo/47S7Vz8pKRL+jptA4qqFAG4mbzlDdS/vSb0xD7OA=="
+      crossorigin="anonymous"></script>
+
     <script type="module" src="./index.js"></script>
   </head>
   <body>
     <!-- ❗️❗️❗️ Add partials like so for every page -->
-    <include src="./partials/example.html"></include>
+    <form class="search-form" id="search-form">
+      <input 
+      type="text" 
+      name="searchQuery" 
+      autocomplete="off" 
+      placeholder="Search images..." />
+      <button type="submit">Search</button>
+    </form>
+    <!-- <include src="./partials/example.html"></include> -->
+    <div id="images-container"></div> <!-- ❗️❗️❗️ This line has been added -->
+
+    <button type="button" class="load-more">Load more</button>
   </body>
 </html>
