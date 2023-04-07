@@ -86,95 +86,80 @@
 
 // export { searchImages };
 
-// TEST - 3 replace the fetch function with the Axios library:
+// TEST - 3 
 
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-import axios from 'axios';
-import { createImageElement } from './markup-data-rendering.js';
-import { showNoResultsMessage } from './alert-messages.js';
+import {showPleaseInterRequest, showNoResultsMessage, showAlert, showWrong, showOops} from './js/alert-messages.js';
+import { refs } from "./js/refs.js";
+import { pixabayApi } from './js/pixabayAPI.js';
+import { createObjectsMarkup } from './js/markup-data-rendering.js'
+import { connectSimpleLightBox, scroll } from './js/display-data.js'
+// import Notiflix from 'notiflix';
+// import SimpleLightbox from 'simplelightbox';
+// import 'simplelightbox/dist/simple-lightbox.min.css';
+// import { connectSimpleLightBox } from './js/display-data.js'
 
-const lightbox = new SimpleLightbox('.image-container a', {});
+refs.btnLoadMore.classList.add("is-hidden");
 
-const API_KEY = '35028800-20b44384747278ffeb1b55203';
-const imagesPerPage = 40;
+// console.log(refs.form);
+// console.log(refs.btnLoadMore);
+// console.log(refs.galleryContainer);
 
-const form = document.querySelector('#search-form');
-const searchInput = document.querySelector('input[name="searchQuery"]');
-const loadMoreButton = document.querySelector('.load-more');
+const exampleEl = new pixabayApi();
 
-form.addEventListener('submit', handleSubmit);
-
-loadMoreButton.addEventListener('click', handleLoadMoreClick);
-
-function handleSubmit(event) {
-  event.preventDefault();
-  const query = searchInput.value;
-  searchImages(query, 1);
-}
-
-async function searchImages(query, page) {
-  const url = `https://pixabay.com/api/?key=${API_KEY}&q=${query}&per_page=${imagesPerPage}&page=${page}`;
-  try {
-    const response = await axios.get(url);
-    const data = response.data;
-    console.log(data.hits);
-    if (page === 1) {
-      displayImages(data);
-      loadMoreButton.classList.remove('disabled');
-      loadMoreButton.classList.add('visible');
-    } else {
-      appendImages(data);
-    }
-    if (data.hits.length === 0) {
-      showNoResultsMessage();
-    } else if (data.totalHits <= page * imagesPerPage) {
-      loadMoreButton.classList.add('disabled');
-      showAlert();
-    }
-  } catch (error) {
-    console.error(error);
-    showWrong();
+const onSubmit = async e => {
+  e.preventDefault();
+  const {
+    elements: { searchQuery },
+  } = e.currentTarget;
+  const userQuery = searchQuery.value.trim().toLowerCase()
+  if (!userQuery) {
+    showPleaseInterRequest();
+    return;
   }
+  console.log(userQuery);
+  exampleEl.query = userQuery;
+  cleanMarkup();
+  try {
+    const getResponse = await exampleEl.getPhotos();
+    const { total, totalHits, hits } = getResponse;
+    console.log(hits);
+    if (hits.length === 0) { showNoResultsMessage(); return; }
+    console.log(getResponse);
+    const objectsMarkup = createObjectsMarkup(hits);
+    console.log(objectsMarkup);
+    refs.galleryContainer.insertAdjacentHTML('beforeend', objectsMarkup);
+    connectSimpleLightBox();
+    exampleEl.quantityTotalPages(total);
+    if (exampleEl.loadMore) { refs.btnLoadMore.classList.remove("is-hidden") }
+  }
+  catch (error) { showWrong(); }
+};
+
+function cleanMarkup() {
+  refs.galleryContainer.innerHTML = '';
+  exampleEl.restPage();
+  refs.btnLoadMore.classList.add("is-hidden");
 }
 
 function handleLoadMoreClick() {
-  const query = searchInput.value;
-  const page = Math.ceil(document.querySelectorAll('.images-container').length / imagesPerPage) + 1;
-  searchImages(query, page);
-}
-
-function displayImages(data) {
-  const imagesContainer = document.querySelector('#images-container');
-  imagesContainer.innerHTML = '';
-  data.hits.forEach(imageData => {
-    const imageElement = createImageElement(imageData);
-    imagesContainer.appendChild(imageElement);
-  });
-  lightbox.refresh();
-}
-
-function appendImages(data) {
-  const imagesContainer = document.querySelector('#images-container');
-  data.hits.forEach(imageData => {
-    const imageElement = createImageElement(imageData);
-    imagesContainer.appendChild(imageElement);
-  });
-  lightbox.refresh();
-}
-
-function setLoadMoreButtonState(totalHits, currentPage) {
-  if (totalHits <= currentPage * imagesPerPage) {
-    loadMoreButton.classList.add('disabled');
-  } else {
-    loadMoreButton.classList.remove('disabled');
+  exampleEl.currentPage();
+  if (!exampleEl.loadMore) {
+    refs.btnLoadMore.classList.add("is-hidden");
+    showAlert();
   }
+  exampleEl.getPhotos().then(({ hits }) => {
+    const murkup = createObjectsMarkup(hits);
+    refs.galleryContainer.insertAdjacentHTML("beforeend", murkup);
+    console.log(exampleEl.page);
+    console.log(hits.length);
+    scroll();
+  })
+  .catch(error => {
+    console.log(error.massage);
+    // showOops();
+    // cleanMarkup();
+  });
 }
 
-
-
-
-
-
-
-
+refs.form.addEventListener('submit', onSubmit);
+refs.btnLoadMore.addEventListener("click", handleLoadMoreClick);
