@@ -41,6 +41,7 @@ export class pixabayApi {
     this.totalPages = Math.ceil(total / this.imagesPerPage);
   }
   get loadMore() {
+    console.log(this.page, this.totalPages)
     return this.page < this.totalPages;
   }
   get totalPages() {

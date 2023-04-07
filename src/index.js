@@ -129,7 +129,7 @@ const onSubmit = async e => {
     console.log(objectsMarkup);
     refs.galleryContainer.insertAdjacentHTML('beforeend', objectsMarkup);
     connectSimpleLightBox();
-    exampleEl.quantityTotalPages(total);
+    exampleEl.quantityTotalPages(totalHits);
     if (exampleEl.loadMore) { refs.btnLoadMore.classList.remove("is-hidden") }
   }
   catch (error) { showWrong(); }
@@ -161,5 +161,5 @@ function handleLoadMoreClick() {
   });
 }
 
-refs.form.addEventListener('submit', onSubmit);
 refs.btnLoadMore.addEventListener("click", handleLoadMoreClick);
+refs.form.addEventListener('submit', onSubmit);
